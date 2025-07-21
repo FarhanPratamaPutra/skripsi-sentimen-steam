@@ -34,10 +34,21 @@ def load_models_and_vectorizer():
         vectorizer = pickle.load(vectorizer_file)
     return model_nb, model_knn, vectorizer
 
-# --- MEMUAT MODEL ---
-model_nb, model_knn, vectorizer = load_models_and_vectorizer()
+# --- FUNGSI BARU UNTUK MEMUAT DATA ULASAN --- # <<< BARU
+@st.cache_data
+def load_review_data():
+    df = pd.read_csv('labeled_data.csv')
+    # Pastikan tidak ada baris kosong yang menyebabkan error
+    df.dropna(subset=['stemming', 'label'], inplace=True)
+    positive_reviews = df[df['label'] == 'positif']
+    negative_reviews = df[df['label'] == 'negatif']
+    return positive_reviews, negative_reviews
 
-# --- SIDEBAR (lebih simpel) ---
+# --- MEMUAT MODEL DAN DATA ---
+model_nb, model_knn, vectorizer = load_models_and_vectorizer()
+positive_reviews, negative_reviews = load_review_data() # <<< BARU
+
+# --- SIDEBAR ---
 with st.sidebar:
     st.header("⚙️ Pengaturan Model")
     model_choice = st.sidebar.radio(
@@ -56,14 +67,15 @@ col1, col2 = st.columns(2, gap="large")
 with col1:
     st.subheader("📝 Input Ulasan Anda")
 
-    contoh_positif = "Aplikasinya keren dan sangat membantu, banyak diskon game!"
-    contoh_negatif = "Login susah banget, sering error dan lambat. Kecewa."
-
+    # --- LOGIKA TOMBOL CONTOH DIUBAH --- # <<< DIUBAH
     if st.button('Coba Contoh Positif', use_container_width=True):
-        st.session_state.user_input = contoh_positif
+        # Ambil 1 sampel acak dari data positif
+        st.session_state.user_input = positive_reviews['stemming'].sample(1).iloc[0]
     if st.button('Coba Contoh Negatif', use_container_width=True):
-        st.session_state.user_input = contoh_negatif
+        # Ambil 1 sampel acak dari data negatif
+        st.session_state.user_input = negative_reviews['stemming'].sample(1).iloc[0]
 
+    # --- FORM INPUT ---
     with st.form(key='sentiment_form'):
         user_input = st.text_area(
             "Masukkan ulasan untuk dianalisis:",
@@ -109,7 +121,7 @@ with tab1:
     Aplikasi ini merupakan bagian dari pengerjaan Skripsi di bidang Ilmu Komputer dengan fokus pada *Natural Language Processing* (NLP) dan *Machine Learning*.
     - **Tujuan**: Menganalisis dan membandingkan kinerja algoritma Naive Bayes dan K-Nearest Neighbors untuk klasifikasi sentimen pada ulasan aplikasi Steam.
     - **Metodologi**: CRISP-DM.
-    - **Dibuat oleh**: Farhan Pratama Putra - 10121440 - Universitas Gunadarma
+    - **Dibuat oleh**: [Nama Anda] - [NIM Anda] - [Universitas Anda]
     """)
 
 with tab2:
