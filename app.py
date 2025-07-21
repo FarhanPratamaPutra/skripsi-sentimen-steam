@@ -1,7 +1,7 @@
 import streamlit as st
 import pickle
 import pandas as pd
-import random # <<< BARU: Import library random
+import random
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -35,11 +35,8 @@ def load_models_and_vectorizer():
         vectorizer = pickle.load(vectorizer_file)
     return model_nb, model_knn, vectorizer
 
-# --- FUNGSI load_review_data() DIHAPUS --- # <<< DIHAPUS
-
 # --- MEMUAT MODEL ---
 model_nb, model_knn, vectorizer = load_models_and_vectorizer()
-# --- Baris untuk memuat data review dihapus ---
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -60,27 +57,38 @@ col1, col2 = st.columns(2, gap="large")
 with col1:
     st.subheader("📝 Input Ulasan Anda")
 
-    # --- DAFTAR KALIMAT CONTOH (HARDCODED) --- # <<< BARU
+    # --- DAFTAR KALIMAT CONTOH (DIUBAH SESUAI PERMINTAAN) --- # <<< DIUBAH
     contoh_positif_list = [
         "Aplikasinya keren dan sangat membantu, banyak diskon game!",
-        "Terima kasih steam, akun saya yang dihack akhirnya bisa kembali.",
-        "Aplikasi ini bagus untuk memantau akun dan membeli game saat ada diskon.",
-        "Mantap, proses trade jadi sangat mudah dan aman lewat hp."
+        "Mantap, proses trade jadi sangat mudah dan aman lewat hp",
+        "aplikasinya mudah digunakan",
+        "jadi mudah beli game dari hp, tidak perlu buka PC",
+        "awalnya lupa password, ngurus lewat hp jadi mudah, cepat ditangani, sangat bagus",
+        "sekarang gampang akses info tentang steam",
+        "Cek diskon musiman sekarang gampang banget, tinggal buka aplikasi",
+        "Notifikasi flash sale langsung ke ponsel",
+        "Download game dari kantor sangat praktis",
+        "Sangat membantu saat Steam Summer Sale."
     ]
     contoh_negatif_list = [
-        "Login susah banget, sering error dan lambat. Kecewa.",
-        "Ribet banget, bikin akun saja gagal terus karena verifikasi email.",
-        "Captcha-nya aneh, sudah diisi benar masih saja salah. Sulit login.",
-        "Aplikasi ini boros kuota dan sering macet saat dibuka."
+        "aplikasinya burik banget susah",
+        "Autentikasi kadang gagal tanpa alasan jelas",
+        "Tidak bisa lihat semua detail library",
+        "Tidak semua fitur desktop tersedia di mobile.",
+        "Tidak bisa melihat badge atau Steam Points jelas",
+        "Chat sering tidak sinkron dengan versi desktop",
+        "Ganti akun ribet, harus hapus data aplikasi",
+        "Market lambat banget, udah kayak pakai internet 2G",
+        "Chat nggak nyampe, terus malah error pas dikirim ulang",
+        "Sering error waktu buka halaman komunitas atau berita"
     ]
+    # --- BATAS PERUBAHAN ---
 
-    # --- LOGIKA TOMBOL CONTOH DIUBAH --- # <<< DIUBAH
     if st.button('Coba Contoh Positif', use_container_width=True):
         st.session_state.user_input = random.choice(contoh_positif_list)
     if st.button('Coba Contoh Negatif', use_container_width=True):
         st.session_state.user_input = random.choice(contoh_negatif_list)
 
-    # --- FORM INPUT ---
     with st.form(key='sentiment_form'):
         user_input = st.text_area(
             "Masukkan ulasan untuk dianalisis:",
@@ -115,3 +123,37 @@ with col2:
 
     else:
         st.info("Silakan masukkan ulasan dan klik tombol analisis untuk melihat hasilnya.")
+
+# --- TABS UNTUK INFORMASI TAMBAHAN ---
+st.markdown("<br>", unsafe_allow_html=True)
+tab1, tab2, tab3 = st.tabs(["📜 Tentang Aplikasi", "🧠 Cara Kerja", "📈 Performa Model"])
+
+with tab1:
+    st.subheader("Deskripsi Proyek")
+    st.markdown("""
+    Aplikasi ini merupakan bagian dari pengerjaan Skripsi di bidang Ilmu Komputer dengan fokus pada *Natural Language Processing* (NLP) dan *Machine Learning*.
+    - **Tujuan**: Menganalisis dan membandingkan kinerja algoritma Naive Bayes dan K-Nearest Neighbors untuk klasifikasi sentimen pada ulasan aplikasi Steam.
+    - **Metodologi**: CRISP-DM.
+    - **Dibuat oleh**: [Nama Anda] - [NIM Anda] - [Universitas Anda]
+    """)
+
+with tab2:
+    st.subheader("Alur Kerja Proses Analisis")
+    st.markdown("""
+    1.  **Input Teks**: Teks ulasan yang Anda masukkan.
+    2.  **TF-IDF Vectorization**: Teks diubah menjadi representasi numerik yang mengukur pentingnya sebuah kata dalam ulasan.
+    3.  **Klasifikasi**: Vektor numerik tersebut dimasukkan ke dalam model machine learning yang dipilih untuk memprediksi label sentimen **Positif** atau **Negatif**.
+    """)
+
+with tab3:
+    st.subheader("Tabel Perbandingan Kinerja Model")
+    performance_data = {
+        'Model': ['Naive Bayes', 'KNN'],
+        'Akurasi': [0.80, 0.65],
+        'Presisi': [0.81, 0.64],
+        'Recall': [0.72, 0.65],
+        'F1-Score': [0.74, 0.63]
+    }
+    df_performance = pd.DataFrame(performance_data)
+    st.dataframe(df_performance, use_container_width=True, hide_index=True)
+    st.caption("Performa dihitung berdasarkan *Macro Average* pada data uji.")
