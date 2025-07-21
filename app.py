@@ -118,7 +118,7 @@ with tab1:
     Aplikasi ini merupakan bagian dari pengerjaan Skripsi di bidang Ilmu Komputer dengan fokus pada *Natural Language Processing* (NLP) dan *Machine Learning*.
     - **Tujuan**: Mengimplementasikan model Naive Bayes untuk klasifikasi sentimen pada ulasan aplikasi Steam.
     - **Metodologi**: CRISP-DM.
-    - **Dibuat oleh**: [Nama Anda] - [NIM Anda] - [Universitas Anda]
+    - **Dibuat oleh**: Farhan Pratama Putra - 10121440 - Universitas Gunadarma
     """)
 
 with tab2:
