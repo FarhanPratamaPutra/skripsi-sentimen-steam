@@ -2,6 +2,10 @@ import streamlit as st
 import pickle
 import pandas as pd
 
+st.set_page_config(
+    layout="wide"
+)
+
 # --- KONFIGURASI HALAMAN --- # <-- BARU
 st.set_page_config(
     page_title="Analisis Sentimen Steam",
