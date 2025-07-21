@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import random # <<< BARU: Import library random
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -34,19 +35,11 @@ def load_models_and_vectorizer():
         vectorizer = pickle.load(vectorizer_file)
     return model_nb, model_knn, vectorizer
 
-# --- FUNGSI BARU UNTUK MEMUAT DATA ULASAN --- # <<< BARU
-@st.cache_data
-def load_review_data():
-    df = pd.read_csv('labeled_data.csv')
-    # Pastikan tidak ada baris kosong yang menyebabkan error
-    df.dropna(subset=['stemming', 'label'], inplace=True)
-    positive_reviews = df[df['label'] == 'positif']
-    negative_reviews = df[df['label'] == 'negatif']
-    return positive_reviews, negative_reviews
+# --- FUNGSI load_review_data() DIHAPUS --- # <<< DIHAPUS
 
-# --- MEMUAT MODEL DAN DATA ---
+# --- MEMUAT MODEL ---
 model_nb, model_knn, vectorizer = load_models_and_vectorizer()
-positive_reviews, negative_reviews = load_review_data() # <<< BARU
+# --- Baris untuk memuat data review dihapus ---
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -67,13 +60,25 @@ col1, col2 = st.columns(2, gap="large")
 with col1:
     st.subheader("📝 Input Ulasan Anda")
 
+    # --- DAFTAR KALIMAT CONTOH (HARDCODED) --- # <<< BARU
+    contoh_positif_list = [
+        "Aplikasinya keren dan sangat membantu, banyak diskon game!",
+        "Terima kasih steam, akun saya yang dihack akhirnya bisa kembali.",
+        "Aplikasi ini bagus untuk memantau akun dan membeli game saat ada diskon.",
+        "Mantap, proses trade jadi sangat mudah dan aman lewat hp."
+    ]
+    contoh_negatif_list = [
+        "Login susah banget, sering error dan lambat. Kecewa.",
+        "Ribet banget, bikin akun saja gagal terus karena verifikasi email.",
+        "Captcha-nya aneh, sudah diisi benar masih saja salah. Sulit login.",
+        "Aplikasi ini boros kuota dan sering macet saat dibuka."
+    ]
+
     # --- LOGIKA TOMBOL CONTOH DIUBAH --- # <<< DIUBAH
     if st.button('Coba Contoh Positif', use_container_width=True):
-        # Ambil 1 sampel acak dari data positif
-        st.session_state.user_input = positive_reviews['stemming'].sample(1).iloc[0]
+        st.session_state.user_input = random.choice(contoh_positif_list)
     if st.button('Coba Contoh Negatif', use_container_width=True):
-        # Ambil 1 sampel acak dari data negatif
-        st.session_state.user_input = negative_reviews['stemming'].sample(1).iloc[0]
+        st.session_state.user_input = random.choice(contoh_negatif_list)
 
     # --- FORM INPUT ---
     with st.form(key='sentiment_form'):
@@ -110,37 +115,3 @@ with col2:
 
     else:
         st.info("Silakan masukkan ulasan dan klik tombol analisis untuk melihat hasilnya.")
-
-# --- TABS UNTUK INFORMASI TAMBAHAN ---
-st.markdown("<br>", unsafe_allow_html=True)
-tab1, tab2, tab3 = st.tabs(["📜 Tentang Aplikasi", "🧠 Cara Kerja", "📈 Performa Model"])
-
-with tab1:
-    st.subheader("Deskripsi Proyek")
-    st.markdown("""
-    Aplikasi ini merupakan bagian dari pengerjaan Skripsi di bidang Ilmu Komputer dengan fokus pada *Natural Language Processing* (NLP) dan *Machine Learning*.
-    - **Tujuan**: Menganalisis dan membandingkan kinerja algoritma Naive Bayes dan K-Nearest Neighbors untuk klasifikasi sentimen pada ulasan aplikasi Steam.
-    - **Metodologi**: CRISP-DM.
-    - **Dibuat oleh**: [Nama Anda] - [NIM Anda] - [Universitas Anda]
-    """)
-
-with tab2:
-    st.subheader("Alur Kerja Proses Analisis")
-    st.markdown("""
-    1.  **Input Teks**: Teks ulasan yang Anda masukkan.
-    2.  **TF-IDF Vectorization**: Teks diubah menjadi representasi numerik yang mengukur pentingnya sebuah kata dalam ulasan.
-    3.  **Klasifikasi**: Vektor numerik tersebut dimasukkan ke dalam model machine learning yang dipilih untuk memprediksi label sentimen **Positif** atau **Negatif**.
-    """)
-
-with tab3:
-    st.subheader("Tabel Perbandingan Kinerja Model")
-    performance_data = {
-        'Model': ['Naive Bayes', 'KNN'],
-        'Akurasi': [0.80, 0.65],
-        'Presisi': [0.81, 0.64],
-        'Recall': [0.72, 0.65],
-        'F1-Score': [0.74, 0.63]
-    }
-    df_performance = pd.DataFrame(performance_data)
-    st.dataframe(df_performance, use_container_width=True, hide_index=True)
-    st.caption("Performa dihitung berdasarkan *Macro Average* pada data uji.")
