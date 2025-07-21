@@ -17,35 +17,23 @@ st.markdown("""
             padding-top: 2rem;
             padding-bottom: 1rem;
         }
-        .st-emotion-cache-1y4p8pa {
-            padding-top: 1.5rem;
-        }
     </style>
 """, unsafe_allow_html=True)
 
 
-# --- FUNGSI UNTUK MEMUAT MODEL ---
+# --- FUNGSI UNTUK MEMUAT MODEL (HANYA NAIVE BAYES) ---
 @st.cache_resource
-def load_models_and_vectorizer():
+def load_model_and_vectorizer():
     with open('naive_bayes_model.pkl', 'rb') as model_file:
         model_nb = pickle.load(model_file)
-    with open('knn_model.pkl', 'rb') as model_file:
-        model_knn = pickle.load(model_file)
     with open('tfidf_vectorizer.pkl', 'rb') as vectorizer_file:
         vectorizer = pickle.load(vectorizer_file)
-    return model_nb, model_knn, vectorizer
+    return model_nb, vectorizer
 
 # --- MEMUAT MODEL ---
-model_nb, model_knn, vectorizer = load_models_and_vectorizer()
+model, vectorizer = load_model_and_vectorizer()
 
-# --- SIDEBAR ---
-with st.sidebar:
-    st.header("⚙️ Pengaturan Model")
-    model_choice = st.sidebar.radio(
-        "Pilih Algoritma Klasifikasi:",
-        ('Naive Bayes', 'K-Nearest Neighbors (KNN)'),
-        key='model_selection'
-    )
+# --- SIDEBAR DIHAPUS ---
 
 # --- UTAMA APLIKASI ---
 st.title("Analisis Sentimen Ulasan Aplikasi Steam 🕵️")
@@ -57,7 +45,6 @@ col1, col2 = st.columns(2, gap="large")
 with col1:
     st.subheader("📝 Input Ulasan Anda")
 
-    # --- DAFTAR KALIMAT CONTOH (DIUBAH SESUAI PERMINTAAN) --- # <<< DIUBAH
     contoh_positif_list = [
         "Aplikasinya keren dan sangat membantu, banyak diskon game!",
         "Mantap, proses trade jadi sangat mudah dan aman lewat hp",
@@ -82,7 +69,6 @@ with col1:
         "Chat nggak nyampe, terus malah error pas dikirim ulang",
         "Sering error waktu buka halaman komunitas atau berita"
     ]
-    # --- BATAS PERUBAHAN ---
 
     if st.button('Coba Contoh Positif', use_container_width=True):
         st.session_state.user_input = random.choice(contoh_positif_list)
@@ -104,8 +90,6 @@ with col2:
     st.subheader("📊 Hasil Analisis")
 
     if submit_button and user_input:
-        model = model_nb if model_choice == 'Naive Bayes' else model_knn
-        
         input_vector = vectorizer.transform([user_input])
         prediction = model.predict(input_vector)
         prediction_proba = model.predict_proba(input_vector)
@@ -119,7 +103,7 @@ with col2:
         else:
             st.error(f"**Hasil Prediksi: Sentimen Negatif** ❌")
         
-        st.metric(label=f"Tingkat Keyakinan ({model_choice})", value=f"{max(prob_positif, prob_negatif):.2%}")
+        st.metric(label="Tingkat Keyakinan", value=f"{max(prob_positif, prob_negatif):.2%}")
 
     else:
         st.info("Silakan masukkan ulasan dan klik tombol analisis untuk melihat hasilnya.")
@@ -132,7 +116,7 @@ with tab1:
     st.subheader("Deskripsi Proyek")
     st.markdown("""
     Aplikasi ini merupakan bagian dari pengerjaan Skripsi di bidang Ilmu Komputer dengan fokus pada *Natural Language Processing* (NLP) dan *Machine Learning*.
-    - **Tujuan**: Menganalisis dan membandingkan kinerja algoritma Naive Bayes dan K-Nearest Neighbors untuk klasifikasi sentimen pada ulasan aplikasi Steam.
+    - **Tujuan**: Mengimplementasikan model Naive Bayes untuk klasifikasi sentimen pada ulasan aplikasi Steam.
     - **Metodologi**: CRISP-DM.
     - **Dibuat oleh**: [Nama Anda] - [NIM Anda] - [Universitas Anda]
     """)
@@ -142,17 +126,14 @@ with tab2:
     st.markdown("""
     1.  **Input Teks**: Teks ulasan yang Anda masukkan.
     2.  **TF-IDF Vectorization**: Teks diubah menjadi representasi numerik yang mengukur pentingnya sebuah kata dalam ulasan.
-    3.  **Klasifikasi**: Vektor numerik tersebut dimasukkan ke dalam model machine learning yang dipilih untuk memprediksi label sentimen **Positif** atau **Negatif**.
+    3.  **Klasifikasi**: Vektor numerik tersebut dimasukkan ke dalam model Naive Bayes yang telah dilatih untuk memprediksi label sentimen **Positif** atau **Negatif**.
     """)
 
 with tab3:
-    st.subheader("Tabel Perbandingan Kinerja Model")
+    st.subheader("Tabel Kinerja Model Naive Bayes")
     performance_data = {
-        'Model': ['Naive Bayes', 'KNN'],
-        'Akurasi': [0.80, 0.65],
-        'Presisi': [0.81, 0.64],
-        'Recall': [0.72, 0.65],
-        'F1-Score': [0.74, 0.63]
+        'Metrik': ['Akurasi', 'Presisi', 'Recall', 'F1-Score'],
+        'Nilai': [0.80, 0.81, 0.72, 0.74]
     }
     df_performance = pd.DataFrame(performance_data)
     st.dataframe(df_performance, use_container_width=True, hide_index=True)
