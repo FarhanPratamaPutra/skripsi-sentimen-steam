@@ -112,8 +112,6 @@ if submit_button and user_input:
     
     st.metric(label=f"Tingkat Keyakinan ({model_choice})", value=f"{max(prob_positif, prob_negatif):.2%}")
 
-    # --- BLOK PENJELASAN BARU --- # <<< BARU
-    st.markdown("---") # Garis pemisah
     if model_choice == 'Naive Bayes':
         st.info(
             """
@@ -121,14 +119,13 @@ if submit_button and user_input:
             Skor ini dihitung berdasarkan **probabilitas (peluang)**. Model menghitung seberapa besar kemungkinan ulasan Anda tergolong 'positif' atau 'negatif' berdasarkan kemunculan kata-kata di dalamnya, lalu membandingkannya dengan pola kata pada data yang sudah dilatih.
             """
         )
-    else: # Penjelasan untuk KNN
+    else: 
         st.info(
             """
             💡 **Penjelasan Keyakinan KNN:**
             Skor ini ditentukan oleh **'tetangga terdekat'**. Model mencari beberapa ulasan di data latih yang paling mirip dengan ulasan Anda. Persentase ini menunjukkan berapa banyak dari 'tetangga' tersebut yang sentimennya sama dengan hasil prediksi.
             """
         )
-    # --- BATAS BLOK PENJELASAN ---
 
 # --- TABS UNTUK INFORMASI TAMBAHAN ---
 st.markdown("<br>", unsafe_allow_html=True)
@@ -155,11 +152,23 @@ with tab3:
     st.subheader("Tabel Perbandingan Kinerja Model")
     performance_data = {
         'Model': ['Naive Bayes', 'KNN'],
-        'Akurasi': [0.80, 0.69],
-        'Presisi': [0.81, 0.67],
-        'Recall': [0.72, 0.69],
-        'F1-Score': [0.74, 0.67]
+        'Akurasi': [0.80, 0.65],
+        'Presisi': [0.81, 0.64],
+        'Recall': [0.72, 0.65],
+        'F1-Score': [0.74, 0.63]
     }
     df_performance = pd.DataFrame(performance_data)
     st.dataframe(df_performance, use_container_width=True, hide_index=True)
     st.caption("Performa dihitung berdasarkan *Macro Average* pada data uji.")
+
+    # --- BLOK PENJELASAN METRIK BARU
+    st.markdown("---") 
+    st.subheader("Penjelasan Singkat Metrik")
+    st.markdown(
+        """
+        - **Akurasi**: Persentase seberapa sering model menebak sentimen (baik positif maupun negatif) dengan benar dari keseluruhan data.
+        - **Presisi**: Mengukur ketepatan prediksi. Dari semua yang ditebak sebagai 'positif', berapa persen yang benar? Begitu pula untuk 'negatif'.
+        - **Recall**: Mengukur kelengkapan model. Dari semua yang seharusnya 'positif', berapa persen yang berhasil ditemukan model? Begitu pula untuk 'negatif'.
+        - **F1-Score**: Nilai gabungan yang menyeimbangkan antara Presisi dan Recall, memberikan satu angka performa yang komprehensif.
+        """
+    )
