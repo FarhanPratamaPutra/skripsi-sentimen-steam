@@ -155,10 +155,10 @@ with tab3:
     st.subheader("Tabel Perbandingan Kinerja Model")
     performance_data = {
         'Model': ['Naive Bayes', 'KNN'],
-        'Akurasi': [0.80, 0.65],
-        'Presisi': [0.81, 0.64],
-        'Recall': [0.72, 0.65],
-        'F1-Score': [0.74, 0.63]
+        'Akurasi': [0.80, 0.69],
+        'Presisi': [0.81, 0.67],
+        'Recall': [0.72, 0.69],
+        'F1-Score': [0.74, 0.67]
     }
     df_performance = pd.DataFrame(performance_data)
     st.dataframe(df_performance, use_container_width=True, hide_index=True)
