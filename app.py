@@ -152,8 +152,8 @@ with tab3:
     st.subheader("Tabel Perbandingan Kinerja Model")
     performance_data = {
         'Model': ['Naive Bayes', 'KNN'],
-        'Akurasi': [0.80, 0.65],
-        'Presisi': [0.81, 0.64],
+        'AAccuracy': [0.80, 0.65],
+        'Precision': [0.81, 0.64],
         'Recall': [0.72, 0.65],
         'F1-Score': [0.74, 0.63]
     }
@@ -166,8 +166,8 @@ with tab3:
     st.subheader("Penjelasan Singkat Metrik")
     st.markdown(
         """
-        - **Akurasi**: Persentase seberapa sering model menebak sentimen (baik positif maupun negatif) dengan benar dari keseluruhan data.
-        - **Presisi**: Mengukur ketepatan prediksi. Dari semua yang ditebak sebagai 'positif', berapa persen yang benar? Begitu pula untuk 'negatif'.
+        - **Accuracy**: Persentase seberapa sering model menebak sentimen (baik positif maupun negatif) dengan benar dari keseluruhan data.
+        - **Precision**: Mengukur ketepatan prediksi. Dari semua yang ditebak sebagai 'positif', berapa persen yang benar? Begitu pula untuk 'negatif'.
         - **Recall**: Mengukur kelengkapan model. Dari semua yang seharusnya 'positif', berapa persen yang berhasil ditemukan model? Begitu pula untuk 'negatif'.
         - **F1-Score**: Nilai gabungan yang menyeimbangkan antara Presisi dan Recall, memberikan satu angka performa yang komprehensif.
         """
