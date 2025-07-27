@@ -26,33 +26,34 @@ st.markdown("""
 def load_models_and_vectorizer():
     with open('naive_bayes_model.pkl', 'rb') as model_file:
         model_nb = pickle.load(model_file)
-    with open('knn_model.pkl', 'rb') as model_file:
-        model_knn = pickle.load(model_file)
+    # Mengganti knn_model.pkl dengan model regresi logistik
+    with open('logistic_regression_model.pkl', 'rb') as model_file:
+        model_lr = pickle.load(model_file)
     with open('tfidf_vectorizer.pkl', 'rb') as vectorizer_file:
         vectorizer = pickle.load(vectorizer_file)
-    return model_nb, model_knn, vectorizer
+    return model_nb, model_lr, vectorizer
 
 # --- MEMUAT MODEL ---
-model_nb, model_knn, vectorizer = load_models_and_vectorizer()
+model_nb, model_lr, vectorizer = load_models_and_vectorizer()
 
 
 # --- UTAMA APLIKASI ---
 st.title("Analisis Sentimen Ulasan Aplikasi Steam 🕵️")
-st.markdown("Aplikasi ini membandingkan performa model **Naive Bayes** dan **K-Nearest Neighbors (KNN)** untuk analisis sentimen.")
+st.markdown("Aplikasi ini membandingkan performa model **Naive Bayes** dan **Logistic Regression** untuk analisis sentimen.")
 st.markdown("---")
 
 # --- PENGATURAN MODEL (DI HALAMAN UTAMA) ---
 st.subheader("⚙️ Pengaturan Model")
 model_choice = st.radio(
     "Pilih Algoritma Klasifikasi:",
-    ('Naive Bayes', 'K-Nearest Neighbors (KNN)'),
+    ('Naive Bayes', 'Logistic Regression'), # Mengganti KNN
     key='model_selection',
     horizontal=True,
 )
 st.markdown("---")
 
 # --- INPUT SECTION ---
-st.subheader("📝 Input Ulasan Anda")
+st.subheader("📝 Input Ulasan")
 
 contoh_positif_list = [
     "Aplikasinya keren dan sangat membantu, banyak diskon game!",
@@ -95,7 +96,8 @@ if submit_button and user_input:
     st.markdown("---")
     st.subheader("📊 Hasil Analisis")
 
-    model = model_nb if model_choice == 'Naive Bayes' else model_knn
+    # Memilih model berdasarkan pilihan radio button
+    model = model_nb if model_choice == 'Naive Bayes' else model_lr
     
     input_vector = vectorizer.transform([user_input])
     prediction = model.predict(input_vector)
@@ -112,6 +114,7 @@ if submit_button and user_input:
     
     st.metric(label=f"Tingkat Keyakinan ({model_choice})", value=f"{max(prob_positif, prob_negatif):.2%}")
 
+    st.markdown("---") 
     if model_choice == 'Naive Bayes':
         st.info(
             """
@@ -119,11 +122,11 @@ if submit_button and user_input:
             Skor ini dihitung berdasarkan **probabilitas (peluang)**. Model menghitung seberapa besar kemungkinan ulasan Anda tergolong 'positif' atau 'negatif' berdasarkan kemunculan kata-kata di dalamnya, lalu membandingkannya dengan pola kata pada data yang sudah dilatih.
             """
         )
-    else: 
+    else: # Penjelasan untuk Logistic Regression
         st.info(
             """
-            💡 **Penjelasan Keyakinan KNN:**
-            Skor ini ditentukan oleh **'tetangga terdekat'**. Model mencari beberapa ulasan di data latih yang paling mirip dengan ulasan Anda. Persentase ini menunjukkan berapa banyak dari 'tetangga' tersebut yang sentimennya sama dengan hasil prediksi.
+            💡 **Penjelasan Keyakinan Logistic Regression:**
+            Skor ini dihasilkan dari **fungsi sigmoid** yang memetakan output ke dalam rentang probabilitas (0 hingga 1). Model mempelajari bobot untuk setiap kata dan menghitung skor total, yang kemudian diubah menjadi probabilitas sentimen positif atau negatif.
             """
         )
 
@@ -135,7 +138,7 @@ with tab1:
     st.subheader("Deskripsi Proyek")
     st.markdown("""
     Aplikasi ini merupakan bagian dari pengerjaan Skripsi di bidang Ilmu Komputer dengan fokus pada *Natural Language Processing* (NLP) dan *Machine Learning*.
-    - **Tujuan**: Menganalisis dan membandingkan kinerja algoritma Naive Bayes dan K-Nearest Neighbors untuk klasifikasi sentimen pada ulasan aplikasi Steam.
+    - **Tujuan**: Menganalisis dan membandingkan kinerja algoritma Naive Bayes dan Logistic Regression untuk klasifikasi sentimen pada ulasan aplikasi Steam.
     - **Metodologi**: CRISP-DM.
     - **Dibuat oleh**: Farhan Pratama Putra - 10121440 - Universitas Gunadarma
     """)
@@ -150,24 +153,25 @@ with tab2:
 
 with tab3:
     st.subheader("Tabel Perbandingan Kinerja Model")
+    # PENTING: Ganti nilai performa Logistic Regression di bawah ini
+    # sesuai dengan hasil dari notebook Anda.
     performance_data = {
-        'Model': ['Naive Bayes', 'KNN'],
-        'AAccuracy': [0.80, 0.65],
-        'Precision': [0.81, 0.64],
-        'Recall': [0.72, 0.65],
-        'F1-Score': [0.74, 0.63]
+        'Model': ['Naive Bayes', 'Logistic Regression'],
+        'Accuracy': [0.71, 0.74], # Ganti 0.82
+        'Precision': [0.74, 0.77], # Ganti 0.82
+        'Recall': [0.67, 0.71], # Ganti 0.81
+        'F1-Score': [0.69, 0.72] # Ganti 0.82
     }
     df_performance = pd.DataFrame(performance_data)
     st.dataframe(df_performance, use_container_width=True, hide_index=True)
     st.caption("Performa dihitung berdasarkan *Macro Average* pada data uji.")
-
-    # --- BLOK PENJELASAN METRIK BARU
+    
     st.markdown("---") 
     st.subheader("Penjelasan Singkat Metrik")
     st.markdown(
         """
-        - **Accuracy**: Persentase seberapa sering model menebak sentimen (baik positif maupun negatif) dengan benar dari keseluruhan data.
-        - **Precision**: Mengukur ketepatan prediksi. Dari semua yang ditebak sebagai 'positif', berapa persen yang benar? Begitu pula untuk 'negatif'.
+        - **Akurasi**: Persentase seberapa sering model menebak sentimen (baik positif maupun negatif) dengan benar dari keseluruhan data.
+        - **Presisi**: Mengukur ketepatan prediksi. Dari semua yang ditebak sebagai 'positif', berapa persen yang benar? Begitu pula untuk 'negatif'.
         - **Recall**: Mengukur kelengkapan model. Dari semua yang seharusnya 'positif', berapa persen yang berhasil ditemukan model? Begitu pula untuk 'negatif'.
         - **F1-Score**: Nilai gabungan yang menyeimbangkan antara Presisi dan Recall, memberikan satu angka performa yang komprehensif.
         """
