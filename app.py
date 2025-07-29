@@ -24,10 +24,13 @@ st.markdown("""
 # --- FUNGSI UNTUK MEMUAT SEMUA MODEL ---
 @st.cache_resource
 def load_models_and_vectorizer():
+    # Memuat model Naive Bayes yang sudah dilatih dengan SMOTE
     with open('naive_bayes_model.pkl', 'rb') as model_file:
         model_nb = pickle.load(model_file)
+    # Memuat model Logistic Regression yang sudah dilatih dengan SMOTE
     with open('logistic_regression_model.pkl', 'rb') as model_file:
         model_lr = pickle.load(model_file)
+    # Memuat TF-IDF Vectorizer
     with open('tfidf_vectorizer.pkl', 'rb') as vectorizer_file:
         vectorizer = pickle.load(vectorizer_file)
     return model_nb, model_lr, vectorizer
@@ -73,7 +76,7 @@ contoh_netral_list = [
     "Sangat memudahkan untuk top-up wallet Steam.",
     "Hanya digunakan untuk cek katalog game.",
     "Baru pertama kali menggunakan aplikasi ini",
-    "Saya hanya membeli game dari aplikasi ini",
+    "Pengguna dapat mengelola pengaturan keluarga (Family view)",
     "Hanya ingin tahu isi dari aplikasinya"
 ]
 
@@ -112,6 +115,7 @@ if submit_button and user_input:
     
     sentiment = prediction[0]
     
+    # Mengambil probabilitas secara dinamis
     class_labels = model.classes_
     prob_dict = {label: prob for label, prob in zip(class_labels, prediction_proba[0])}
 
@@ -171,10 +175,10 @@ with tab3:
     # --- sesuai dengan hasil baru dari notebook Anda setelah SMOTE ---
     performance_data = {
         'Model': ['Naive Bayes', 'Logistic Regression'],
-        'Accuracy': [0.71, 0.75],  # <-- GANTI DENGAN NILAI BARU ANDA
-        'Precision': [0.69, 0.74], # <-- GANTI DENGAN NILAI BARU ANDA
-        'Recall': [0.70, 0.76],    # <-- GANTI DENGAN NILAI BARU ANDA
-        'F1-Score': [0.70, 0.75]   # <-- GANTI DENGAN NILAI BARU ANDA
+        'Accuracy': [0.71, 0.74], 
+        'Precision': [0.74, 0.77],
+        'Recall': [0.67, 0.71],
+        'F1-Score': [0.69, 0.72]
     }
     df_performance = pd.DataFrame(performance_data)
     st.dataframe(df_performance, use_container_width=True, hide_index=True)
@@ -186,7 +190,7 @@ with tab3:
         """
         - **Akurasi**: Persentase seberapa sering model menebak sentimen (baik positif, negatif, maupun netral) dengan benar dari keseluruhan data.
         - **Presisi**: Mengukur ketepatan prediksi. Dari semua yang ditebak sebagai 'positif', berapa persen yang benar? Begitu pula untuk kelas lainnya.
-        - **Recall**: Mengukur kelengkapan model. Dari semua yang seharusnya 'positif', berapa persen yang berhasil ditemukan model? Begitu pula untuk kelas lainnya.
+        - **Recall**s: Mengukur kelengkapan model. Dari semua yang seharusnya 'positif', berapa persen yang berhasil ditemukan model? Begitu pula untuk kelas lainnya.
         - **F1-Score**: Nilai gabungan yang menyeimbangkan antara Presisi dan Recall, memberikan satu angka performa yang komprehensif.
         """
     )
