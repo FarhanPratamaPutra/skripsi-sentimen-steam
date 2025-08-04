@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CSS KUSTOM UNTUK MENGURANGI JARAK ---
+# --- CSS UNTUK MENGURANGI JARAK ---
 st.markdown("""
     <style>
         .block-container {
@@ -175,10 +175,10 @@ with tab3:
     # --- sesuai dengan hasil baru dari notebook Anda setelah SMOTE ---
     performance_data = {
         'Model': ['Naive Bayes', 'Logistic Regression'],
-        'Accuracy': [0.71, 0.74], 
-        'Precision': [0.74, 0.77],
-        'Recall': [0.67, 0.71],
-        'F1-Score': [0.69, 0.72]
+        'Accuracy': [0.71, 0.75], 
+        'Precision': [0.69, 0.74],
+        'Recall': [0.70, 0.76],
+        'F1-Score': [0.70, 0.75]
     }
     df_performance = pd.DataFrame(performance_data)
     st.dataframe(df_performance, use_container_width=True, hide_index=True)
